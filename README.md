@@ -42,6 +42,14 @@ You can customize the behavior of *palworld-query-api* using the following comma
 
 Replace the default values as needed when running the binary.
 
+### Routes
+
+- `/healthz`: This route is used to check the health status of the server.
+
+- `/servers/:name`: This route is used to retrieve server information by specifying the server name.
+
+- `/servers/`: This route lists all available servers and their information.
+
 ### Docker Installation
 
 Alternatively, you can use the Docker image hosted on GitHub. Use the following `docker-compose.yml` file:
