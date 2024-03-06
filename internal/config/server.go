@@ -1,11 +1,8 @@
-// internal/server/server.go
-package server
+package config
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
-	"palworld-query-api/internal/config"
 )
 
 type ServerInfo struct {
@@ -19,16 +16,16 @@ type Players struct {
 	List  []string `json:"list"`
 }
 
-func GetServerData(config *config.Config) (*ServerInfo, error) {
+func GetServerData(serverName string) (*ServerInfo, error) {
 	serverInfo := &ServerInfo{}
 
-	infoOutput, err := runRCONCommand(config, "info")
+	infoOutput, err := runRCONCommand(serverName, "info")
 	if err != nil {
 		return nil, fmt.Errorf("error running 'rcon-cli info': %v", err)
 	}
 	parseServerInfo(infoOutput, serverInfo)
 
-	playersOutput, err := runRCONCommand(config, "showplayers")
+	playersOutput, err := runRCONCommand(serverName, "showplayers")
 	if err != nil {
 		return nil, fmt.Errorf("error running 'rcon-cli showplayers': %v", err)
 	}
@@ -37,13 +34,12 @@ func GetServerData(config *config.Config) (*ServerInfo, error) {
 	return serverInfo, nil
 }
 
-func runRCONCommand(config *config.Config, command string) (string, error) {
-	cmd := exec.Command(config.RconCLIPath, "-config", config.RconCLIConfig, command)
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return string(output), nil
+func runRCONCommand(serverName string, command string) (string, error) {
+    output, err := ExecuteShellCommand(CONFIG.CLI_ROOT, COMMANDS.CONFIG, CONFIG.CLI_CONFIG, COMMANDS.ENV, serverName, command)
+    if err != nil {
+        return "", fmt.Errorf("failed to run rcon-cli: %v", err)
+    }
+    return string(output), nil // Convert output to string before returning
 }
 
 func parseServerInfo(output string, serverInfo *ServerInfo) {
@@ -62,7 +58,9 @@ func parseServerInfo(output string, serverInfo *ServerInfo) {
 
 func parsePlayerList(output string, serverInfo *ServerInfo) {
 	lines := strings.Split(output, "\n")
-	players := Players{}
+	players := Players{
+		List: make([]string, 0), // Initialize the list with an empty slice
+	}
 	for _, line := range lines {
 		if !strings.HasPrefix(line, "name,playeruid,steamid") && line != "" {
 			playerData := strings.Split(line, ",")

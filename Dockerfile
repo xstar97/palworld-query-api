@@ -13,8 +13,7 @@ WORKDIR /build
 # Copy all files from the cmd directory
 COPY go.mod ./go.mod
 COPY go.sum ./go.sum
-COPY internal/server ./internal/server
-COPY internal/utils ./internal/utils
+COPY internal/routes ./internal/routes
 COPY internal/config ./internal/config
 COPY cmd/main.go ./main.go
 
