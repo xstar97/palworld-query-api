@@ -16,7 +16,12 @@ func main() {
 
     // Register servers route
     http.HandleFunc(config.ROUTES.SERVERS, routes.IndexHandler) 
-    
+
+    // Redirect "/" to "/servers"
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        http.Redirect(w, r, config.ROUTES.SERVERS, http.StatusSeeOther)
+    })
+
     log.Printf("server listening on port %s\n", port)
     log.Fatal(http.ListenAndServe(port, nil))
 }
