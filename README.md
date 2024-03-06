@@ -83,6 +83,32 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
 }
 ```
 
+### HomePage intregation CustomAPI
+
+Integrate PalWorld server information seamlessly into your homepage using the CustomAPI widget. By specifying the server environment name, you can display key details such as server name, version, and current player count. Keep your users informed with real-time updates on server status.
+
+```yaml
+    - PalWorld:
+        icon: https://tech.palworldgame.com/img/logo.jpg
+        description: A clone PKM game
+        widget:
+          type: customapi
+          url: "http://localhost:3000/servers/default" # change the name given to server env (not palworld server name!)
+          refreshInterval: 10000
+          method: GET
+          mappings:
+            - field: serverName
+              label: Name
+              format: text
+            - field: serverVer
+              label: Version
+              format: text
+            - field: # needs to be YAML string or object
+                players: count
+              label: Current Players
+              format: number
+```
+
 ### License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
