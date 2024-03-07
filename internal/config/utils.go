@@ -140,8 +140,9 @@ func ExecuteShellCommand(command string, args ...string) ([]byte, error) {
     // Capture the output of the command
     output, err := cmd.CombinedOutput()
     if err != nil {
-        return nil, err
+        log.Println("Error executing command:", err)
     }
-
-    return output, nil
+    
+	log.Println("output: ", string(output))
+    return output, nil // Always return output and nil error
 }
