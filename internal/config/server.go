@@ -35,7 +35,7 @@ func GetServerData(serverName string) (*ServerInfo, error) {
 
     // Parse server version and name
     serverInfo.Version = ParseServerVersion(infoOutput)
-    serverInfo.Name = ParseServerName(infoOutput)
+    serverInfo.Name = ParseServerName(serverInfo.Version,infoOutput)
 
     playersOutput, err := sendCommand(serverName, PALWORLD_RCON_COMMANDS.SHOW_PLAYERS)
     if err != nil {
@@ -58,25 +58,44 @@ func ParseServerVersion(input string) string {
     version := strings.TrimSpace(strings.TrimSuffix(strings.Split(parts[1], "]")[0], " "))
     return version
 }
-func ParseServerName(input string) string {
-    // Find the index of "]" and "\n"
-    start := strings.Index(input, "]")
-    end := strings.Index(input, "\n")
 
-    // Check if both markers are found
-    if start == -1 || end == -1 {
-        return "" // Invalid input format
+func ParseServerName(version, input string) string {
+    // Define the prefix pattern
+    prefix := "Welcome to Pal Server[" + version + "] "
+
+    // Check if the last character of the input string is a newline
+    if !strings.HasSuffix(input, "\n") {
+        // Append a newline character to the input string
+        input += "\n"
     }
 
-    // Extract the name between "]" and "\n"
-    name := strings.TrimSpace(input[start+1:end])
+    // Find the index of the prefix
+    prefixIndex := strings.Index(input, prefix)
+    if prefixIndex == -1 {
+        return "" // Prefix not found
+    }
 
-    // Remove any null terminators from the name
-    name = strings.TrimRightFunc(name, func(r rune) bool {
-        return r == '\u0000'
-    })
+    // Find the index of the newline character after the prefix
+    newlineIndex := strings.Index(input[prefixIndex:], "\n")
+    if newlineIndex == -1 {
+        return "" // Newline not found
+    }
 
-    // Remove any other non-printable characters from the name
+    // Extract the name between the prefix and the newline character
+    name := input[prefixIndex+len(prefix) : prefixIndex+newlineIndex]
+
+    // Trim any leading or trailing whitespace
+    name = strings.TrimSpace(name)
+
+    // Remove any null characters (\u0000) from the name
+    name = strings.Map(func(r rune) rune {
+        if r == '\u0000' {
+            return -1
+        }
+        return r
+    }, name)
+
+    // Remove any non-printable characters from the name
     name = strings.Map(func(r rune) rune {
         if r < utf8.RuneSelf && !unicode.IsPrint(r) {
             return -1
@@ -86,6 +105,7 @@ func ParseServerName(input string) string {
 
     return name
 }
+
 func ParsePlayerList(input string) (int, []Player) {
     var players []Player
 
@@ -120,76 +140,3 @@ func sendCommand(serverName string, command string) (string, error) {
     }
     return string(output), nil // Convert output to string before returning
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-func parseServerInfo(output string, serverInfo *ServerInfo) {
-    lines := strings.Split(output, "\n")
-    for _, line := range lines {
-        if strings.HasPrefix(line, "Welcome to Pal Server") {
-            log.Printf("Parsing line: %s\n", line)
-            parts := strings.SplitN(line, "]", 2)
-            if len(parts) == 2 {
-                version := strings.TrimSpace(parts[0][strings.Index(parts[0], "[")+1:])
-                serverName := strings.TrimSpace(parts[1])
-                log.Printf("Extracted Version: %s, Server Name: %s\n", version, serverName)
-                serverInfo.Version = version
-                serverInfo.Name = serverName
-                break
-            }
-        }
-    }
-}
-
-func parsePlayerList(output string, serverInfo *ServerInfo) {
-    lines := strings.Split(output, "\n")
-    players := Players{
-        List: make([]Player, 0), // Initialize the list with an empty slice
-    }
-    for _, line := range lines {
-        if !strings.HasPrefix(line, "name,playeruid,steamid") && line != "" {
-            log.Printf("Parsing player list line: %s\n", line)
-            playerData := strings.Split(line, ",")
-            if len(playerData) >= 3 {
-                playerName := playerData[0]
-                playerID := playerData[1]
-                steamID := playerData[2]
-                log.Printf("Extracted player name: %s, player ID: %s, steam ID: %s\n", playerName, playerID, steamID)
-                player := Player{
-                    Name: playerName,
-                    PID:  playerID,
-                    SID:  steamID,
-                }
-                players.List = append(players.List, player)
-            }
-        }
-    }
-    players.Count = len(players.List)
-    serverInfo.Players = players
-    log.Printf("Player list parsed. Total players: %d\n", players.Count)
-}*/
-
-
-
-	/*
-    infoOutput, err := sendCommand(serverName)
-    if err != nil {
-        return nil, fmt.Errorf("error running: %v", err)
-    }
-    parseServerInfo(infoOutput, serverInfo)
-
-    playersOutput, err := sendCommand(serverName)
-    if err != nil {
-        return nil, fmt.Errorf("error running: %v", err)
-    }
-    parsePlayerList(playersOutput, serverInfo)*/

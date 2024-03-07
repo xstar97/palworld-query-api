@@ -143,6 +143,6 @@ func ExecuteShellCommand(command string, args ...string) ([]byte, error) {
         log.Println("Error executing command:", err)
     }
     
-	log.Println("output: ", string(output))
+	log.Println("ExecuteShellCommand: ", string(output))
     return output, nil // Always return output and nil error
 }
