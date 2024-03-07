@@ -126,8 +126,13 @@ the output of the api /servers/:name
               label: Current Players
               format: number
             - field: online
-              lable: Online
+              label: Status
               format: text
+              remap:
+                - value: false
+                  to: Not Online
+                - value: true
+                  to: Online
 ```
 
 ### License
