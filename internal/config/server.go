@@ -8,9 +8,10 @@ import (
 )
 
 type ServerInfo struct {
-    Name    string  `json:"serverName"`
-    Version string  `json:"serverVer"`
-    Players Players `json:"players"`
+    Online    bool    `json:"online"`
+    Name      string  `json:"serverName"`
+    Version   string  `json:"serverVer"`
+    Players   Players `json:"players"`
 }
 
 type Player struct {
@@ -31,16 +32,24 @@ func GetServerData(serverName string) (*ServerInfo, error) {
     if err != nil {
         log.Printf("Error running INFO: %v", err)
     }
-	log.Printf("infoOutput: %v", infoOutput)
+    log.Printf("infoOutput: %v", infoOutput)
 
     // Parse server version and name
     serverInfo.Version = ParseServerVersion(infoOutput)
-    serverInfo.Name = ParseServerName(serverInfo.Version,infoOutput)
+    serverInfo.Name = ParseServerName(serverInfo.Version, infoOutput)
+
+    // Set Online field based on server name and version
+    if serverInfo.Name != "" && serverInfo.Version != "" {
+        serverInfo.Online = true
+    } else {
+        serverInfo.Online = false
+    }
 
     playersOutput, err := sendCommand(serverName, PALWORLD_RCON_COMMANDS.SHOW_PLAYERS)
     if err != nil {
         log.Printf("Error running INFO: %v", err)
     }
+    log.Printf("playersOutput: %v", playersOutput)
     // Parse player list
     count, players := ParsePlayerList(playersOutput)
     serverInfo.Players.Count = count
@@ -107,30 +116,34 @@ func ParseServerName(version, input string) string {
 }
 
 func ParsePlayerList(input string) (int, []Player) {
-    var players []Player
+	var players []Player
 
-    lines := strings.Split(input, "\n")
-    count := 0
-    for i := 3; i < len(lines); i++ { // Adjusted the start index to skip the separator line
-        line := strings.TrimSpace(lines[i])
-        if line == "" {
-            continue // Skip empty lines
-        }
-        playerData := strings.Split(line, ",")
-        if len(playerData) != 3 {
-            log.Printf("Malformed player data in line %d: %s", i, line)
-            continue // Skip malformed player data
-        }
-        player := Player{
-            Name: strings.TrimSpace(playerData[0]),
-            PID:  strings.TrimSpace(playerData[1]),
-            SID:  strings.TrimSpace(playerData[2]),
-        }
-        players = append(players, player)
-        count++
-    }
+	lines := strings.Split(input, "\n")
+	count := 0
+	for i := 1; i < len(lines); i++ { // Adjusted the start index to skip the header line
+		line := strings.TrimSpace(lines[i])
+		if line == "" {
+			continue // Skip empty lines
+		}
+		playerData := strings.Split(line, ",")
+		if len(playerData) != 3 {
+			log.Printf("Malformed player data in line %d: %s", i, line)
+			continue // Skip malformed player data
+		}
+		player := Player{
+			Name: strings.TrimSpace(playerData[0]),
+			PID:  strings.TrimSpace(playerData[1]),
+			SID:  strings.TrimSpace(playerData[2]),
+		}
+		players = append(players, player)
+		count++
+	}
 
-    return count, players
+	if count == 0 {
+		return count, []Player{} // Return an empty array if count is 0
+	}
+
+	return count, players
 }
 
 func sendCommand(serverName string, command string) (string, error) {

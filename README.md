@@ -62,10 +62,6 @@ services:
     image: ghcr.io/xstar97/palworld-query-api:latest
     environment:
       - PORT=3000
-      # default values; really dont need to be changed!
-      # - CLI_ROOT=/app/rcon/rcon
-      # - CLI_CONFIG=/config/rcon.yaml
-      # - LOGS_PATH=/logs
       # generates the yaml from this json array (optional, but recommended)
       # - CONFIG_JSON='{"servers":[{"name":"default","address":"localhost:25575","password":"1234567890","type":"rcon","timeout":"10s"}]}'
     ports:
@@ -75,7 +71,7 @@ services:
       - ./logs:/logs
 ```
 
-an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml file needed for the rcon-cli tool.
+an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml file needed for the rcon-cli dependency.
 
 ```json
 {
@@ -94,6 +90,20 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
 ### HomePage intregation CustomAPI
 
 Integrate PalWorld server information seamlessly into your homepage using the CustomAPI widget. By specifying the server environment name, you can display key details such as server name, version, and current player count. Keep your users informed with real-time updates on server status.
+
+the output of the api /servers/:name
+
+```json
+{
+  "online": false,
+  "serverName": "",
+  "serverVer": "",
+  "players": {
+    "count": 0,
+    "list": []
+  }
+}
+```
 
 ```yaml
     - PalWorld:
@@ -115,6 +125,9 @@ Integrate PalWorld server information seamlessly into your homepage using the Cu
                 players: count
               label: Current Players
               format: number
+            - field: online
+              lable: Online
+              format: text
 ```
 
 ### License
