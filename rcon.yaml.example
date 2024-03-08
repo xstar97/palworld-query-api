@@ -3,4 +3,4 @@ default:
   password: ""
   log: "/config/logs/rcon-default.log"
   type: "" # rcon, telnet, web.
-  timeout: "10s"
+  timeout: "60s" # min 60s and for remote servers increase the value

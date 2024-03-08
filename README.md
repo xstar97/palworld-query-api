@@ -75,6 +75,10 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
 }
 ```
 
+### TimeOuts and Warnings
+
+try increasing the timeout value if using a remote server; the min recommended timeout for palworld is 60s; if the server is not local to you; increase it.
+
 ### HomePage intregation CustomAPI
 
 Integrate PalWorld server information seamlessly into your homepage using the CustomAPI widget. By specifying the server environment name, you can display key details such as server name, version, and current player count. Keep your users informed with real-time updates on server status.

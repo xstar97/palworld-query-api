@@ -170,7 +170,7 @@ func sendCommand(configServer ConfigServer, command string) (string, error) {
 		return "", errors.New("RCON server password is empty")
 	}
 
-	conn, err := rcon.Dial(configServer.Address, configServer.Password)
+	conn, err := rcon.Dial(configServer.Address, configServer.Password, rcon.SetDialTimeout(configServer.Timeout), rcon.SetDeadline(configServer.Timeout))
 	if err != nil {
 		log.Println("Error connecting to RCON server:", err)
 		return "", err
