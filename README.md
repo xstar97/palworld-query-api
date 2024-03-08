@@ -64,7 +64,6 @@ Replace the default values as needed when running the binary.
 | days            | ?days=30               |
 | server_time     | ?server_time=1234567890|
 
-
 ### Docker Installation
 
 Alternatively, you can use the Docker image hosted on GitHub. Use the following `docker-compose.yml` file:
@@ -106,6 +105,59 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
 ### TimeOuts and Warnings
 
 try increasing the timeout value if using a remote server; the min recommended timeout for palworld is 60s; if the server is not local to you; increase it.
+
+### HomePage Integration CustomAPI API route
+
+Integrate PalWorld server information seamlessly into your homepage using the CustomAPI widget. By specifying the server environment name, you can display key details such as server name, version, and current player count. Keep your users informed with real-time updates on server status.
+
+the output of this route /api/?name=SERVER_NAME
+
+```json
+{
+  "server_id": "Server ID",
+  "namespace": "production",
+  "type": "community",
+  "region": "all",
+  "name": "Server Name",
+  "map_name": "Mainworld5",
+  "description": "My Awesome Server",
+  "address": "XXX.XXX.XX.XXX",
+  "port": 8211,
+  "is_password": true,
+  "version": "v0.1.5.1",
+  "created_at": 050505050505,
+  "update_at": 060606060,
+  "world_guid": "WORLD_GUID",
+  "current_players": 9000, # OVER 9000!
+  "max_players": 32,
+  "days": 7366,
+  "server_time": 37
+}
+```
+
+```yaml
+    - PalWorld:
+        icon: https://tech.palworldgame.com/img/logo.jpg
+        description: A clone PKM game
+        widget:
+          type: customapi
+          url: "http://localhost:3000/api?name=SERVER_NAME!"
+          refreshInterval: 10000
+          method: GET
+          mappings:
+            - field: name
+              label: Name
+              format: text
+            - field: version
+              label: Version
+              format: text
+            - field: current_players
+              label: Current Players
+              format: number
+            - field: days
+              label: Days Count
+              format: text
+```
 
 ### HomePage Integration CustomAPI Rcon route
 
