@@ -6,11 +6,13 @@ import (
 // Constants for routes
 var Routes = struct {
 	Index string
-	Servers string
+	Rcon string
+	Api string
 	Health  string
 }{
 	Index: "/",
-	Servers: "/servers/",
+	Rcon: "/rcon/",
+	Api: "/api",
 	Health:  "/healthz",
 }
-var RoutesList = []string{Routes.Servers, Routes.Health}
+var RoutesList = []string{Routes.Health,Routes.Rcon, Routes.Api}

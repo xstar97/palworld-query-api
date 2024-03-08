@@ -7,12 +7,12 @@ import (
     "palworld-query-api/internal/config"
 )
 
-func ServersHandler(w http.ResponseWriter, r *http.Request) {
-    routeServers := config.Routes.Servers
+func RconHandler(w http.ResponseWriter, r *http.Request) {
+    routeRcon := config.Routes.Rcon
     path := r.URL.Path
     servers, err := config.GetConfig()
 
-    if path == routeServers {
+    if path == routeRcon {
         if err != nil {
             http.Error(w, "Failed to read server configurations", http.StatusInternalServerError)
             log.Println("Failed to read server configurations:", err)
@@ -21,7 +21,7 @@ func ServersHandler(w http.ResponseWriter, r *http.Request) {
 
         log.Printf("Received API request: %s\n", path)
 
-        serverDataMap, err := getAllServerData(servers)
+        serverDataMap, err := getAllRconData(servers)
         if err != nil {
             http.Error(w, "Error getting all server data", http.StatusInternalServerError)
             log.Println("Error getting all server data:", err)
@@ -40,7 +40,7 @@ func ServersHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Extract server name from path
-    serverName := path[len(routeServers):]
+    serverName := path[len(routeRcon):]
 
     // Validate if the serverName exists in the servers map
     serverData, ok := servers[serverName]
@@ -58,7 +58,7 @@ func ServersHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Get server data by name
-    serverDataInfo, err := config.GetServerData(serverData)
+    serverDataInfo, err := config.GetRconData(serverData)
     if err != nil {
         log.Printf("Error getting server data for %s: %v\n", serverName, err)
         // Return empty JSON object indicating that the server does not exist
@@ -81,10 +81,10 @@ func ServersHandler(w http.ResponseWriter, r *http.Request) {
     log.Printf("Sent server data for %s to client", serverName)
 }
 
-func getAllServerData(servers map[string]config.ConfigServer) (map[string]interface{}, error) {
+func getAllRconData(servers map[string]config.ConfigServer) (map[string]interface{}, error) {
     serverDataMap := make(map[string]interface{})
     for name := range servers {
-        serverDataInfo, err := config.GetServerData(servers[name])
+        serverDataInfo, err := config.GetRconData(servers[name])
         if err != nil {
             return nil, err
         }

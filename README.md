@@ -27,6 +27,7 @@ You can customize the behavior of *palworld-query-api* using the following comma
 | `-port`            | Web port                              | `3000`             |
 | `-cli-config`      | Root path to rcon.yaml                | `/config/rcon.yaml`|
 | `-logs-path`       | Logs path                             | `/logs`            |
+| `-cache-path`       | Cache path                           | `/cache`           |
 
 Replace the default values as needed when running the binary.
 
@@ -56,6 +57,7 @@ services:
       - "3000:3000"
     volumes:
       - ./config:/config
+      - ./cache:/cache
       - ./logs:/logs
 ```
 
@@ -79,11 +81,11 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
 
 try increasing the timeout value if using a remote server; the min recommended timeout for palworld is 60s; if the server is not local to you; increase it.
 
-### HomePage intregation CustomAPI
+### HomePage Integration CustomAPI Rcon route
 
 Integrate PalWorld server information seamlessly into your homepage using the CustomAPI widget. By specifying the server environment name, you can display key details such as server name, version, and current player count. Keep your users informed with real-time updates on server status.
 
-the output of the api /servers/:name
+the output of this route /rcon/:name
 
 ```json
 {
@@ -103,7 +105,7 @@ the output of the api /servers/:name
         description: A clone PKM game
         widget:
           type: customapi
-          url: "http://localhost:3000/servers/default" # change the name given to server env (not palworld server name!)
+          url: "http://localhost:3000/rcon/default" # change the name given to server env (not palworld server name!)
           refreshInterval: 10000
           method: GET
           mappings:

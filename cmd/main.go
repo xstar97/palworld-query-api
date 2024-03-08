@@ -12,13 +12,17 @@ func main() {
 	port := fmt.Sprintf(":%s", config.Config.Port)
 	routeRoot := config.Routes.Index
     routeHealth := config.Routes.Health
-    routeServers := config.Routes.Servers
+    routRcon := config.Routes.Rcon
+    routeApi := config.Routes.Api
 
 	// Register healthz route
 	http.HandleFunc(routeHealth, routes.HealthHandler)
 
-	// Register servers route
-	http.HandleFunc(routeServers, routes.ServersHandler)
+	// Register rcon route
+	http.HandleFunc(routRcon, routes.RconHandler)
+
+	// Register api route
+	http.HandleFunc(routeApi, routes.ApiHandler)
 
 	// Register root route to list available routes
 	http.HandleFunc(routeRoot, routes.IndexHandler)
