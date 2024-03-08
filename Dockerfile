@@ -1,5 +1,5 @@
 # Stage 1 - Build the Go application and download CLI
-FROM golang:1.19.3-alpine AS builder
+FROM golang:1.22.0-alpine3.19 AS builder
 
 # Install necessary build dependencies
 RUN apk --no-cache add --update gcc musl-dev
@@ -24,7 +24,7 @@ RUN go mod download
 RUN CGO_ENABLED=1 go build -ldflags "-w -s" -o /output/palworld-query-api .
 
 # Stage 2 - Create the final image
-FROM alpine AS runner
+FROM alpine:3.19.1 AS runner
 
 # Set maintainer label
 LABEL maintainer="Xstar97 <dev.xstar97@gmail.com>"
@@ -39,13 +39,7 @@ WORKDIR /app
 COPY --from=builder /output/palworld-query-api ./
 
 # Create the necessary directories
-RUN mkdir -p /app/rcon /config /logs
-
-# Download the latest release of rcon-cli
-RUN apk add --no-cache curl tar \
-    && curl -L -o /tmp/rcon.tar.gz $(curl -s https://api.github.com/repos/gorcon/rcon-cli/releases/latest | grep "browser_download_url.*amd64_linux.tar.gz" | cut -d '"' -f 4) \
-    && tar -xzf /tmp/rcon.tar.gz -C ./rcon --strip-components=1 \
-    && rm /tmp/rcon.tar.gz
+RUN mkdir -p /config /logs
 
 # Set user and group environment variables
 ENV APP_USER=apps \
@@ -64,8 +58,7 @@ RUN chown -R $APP_USER:$APP_GROUP /config
 RUN chown -R $APP_USER:$APP_GROUP /logs
 
 # Set environment variables
-ENV RCON_CLI_PATH=/app/rcon/rcon \
-    RCON_CLI_CONFIG=/config/rcon.yaml \
+ENV RCON_CLI_CONFIG=/config/rcon.yaml \
     LOGS_PATH=/logs \
     PORT=3000
 

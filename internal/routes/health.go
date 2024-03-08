@@ -5,7 +5,7 @@ import (
     "net/http"
 )
 
-func HealthzHandler(w http.ResponseWriter, r *http.Request) {
+func HealthHandler(w http.ResponseWriter, r *http.Request) {
     // Set response Content-Type header to indicate JSON
     w.Header().Set("Content-Type", "application/json")
     

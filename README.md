@@ -1,10 +1,10 @@
 # palworld-query-api
 
-Streamlined web API for effortlessly managing and querying Palworld game servers using the RCON protocol.
+Streamlined web API for effortlessly managing and querying PalWorld game servers using the RCON protocol.
 
 ## Features
 
-- Supports querying multiple Palworld game servers.
+- Supports querying multiple PalWorld game servers.
 - Dynamic routing for retrieving server data by name.
 
 ## Installation
@@ -18,25 +18,13 @@ To install and run *palworld-query-api*, follow these steps:
 
 Make sure you have Go installed and properly configured on your system before proceeding.
 
-### Command-Line Installation
-
-To install and run *palworld-query-api* from the command line, follow these steps:
-
-1. Clone the repository: `git clone https://github.com/xstar97/palworld-query-api.git`
-2. Navigate to the project directory: `cd palworld-query-api`
-3. Build the project: `go build`
-4. Run the compiled binary: `./palworld-query-api`
-
-Make sure you have Go installed and properly configured on your system before proceeding.
-
-#### Command-Line Flags
+### Command-Line Flags
 
 You can customize the behavior of *palworld-query-api* using the following command-line flags:
 
 | Flag               | Description                           | Default Value      |
 |--------------------|---------------------------------------|--------------------|
 | `-port`            | Web port                              | `3000`             |
-| `-cli-root`        | Root path to rcon file                | `/app/rcon/rcon`   |
 | `-cli-config`      | Root path to rcon.yaml                | `/config/rcon.yaml`|
 | `-logs-path`       | Logs path                             | `/logs`            |
 
@@ -121,7 +109,7 @@ the output of the api /servers/:name
             - field: serverVer
               label: Version
               format: text
-            - field: # needs to be YAML string or object
+            - field:
                 players: count
               label: Current Players
               format: number
@@ -145,5 +133,5 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](./CONTRIBUTING.md) f
 
 ## Acknowledgements
 
-- [rcon-cli](https://github.com/gorcon/rcon-cli) - The underlying CLI tool for RCON communication.
+- [rcon](https://github.com/gorcon/rcon) - The underlying RCON communication.
 - [palworld](https://palworld.gg/) - The game server platform supported by this tool.

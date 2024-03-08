@@ -5,6 +5,9 @@ import (
     "log"
     "unicode"
 	"unicode/utf8"
+	"github.com/gorcon/rcon"
+    "fmt"
+    "errors"
 )
 
 type ServerInfo struct {
@@ -25,18 +28,20 @@ type Players struct {
     List  []Player `json:"list"`
 }
 
-func GetServerData(serverName string) (*ServerInfo, error) {
+func GetServerData(configServer ConfigServer) (*ServerInfo, error) {
     serverInfo := &ServerInfo{}
+    cmdInfo := Rcon.Command.Info
+    cmdShowPlayers := Rcon.Command.ShowPlayers
 
-    infoOutput, err := sendCommand(serverName, PALWORLD_RCON_COMMANDS.INFO)
+    infoCommandOutput, err := sendCommand(configServer, cmdInfo)
     if err != nil {
         log.Printf("Error running INFO: %v", err)
     }
-    log.Printf("infoOutput: %v", infoOutput)
+    log.Printf("infoCommandOutput: %v", infoCommandOutput)
 
     // Parse server version and name
-    serverInfo.Version = ParseServerVersion(infoOutput)
-    serverInfo.Name = ParseServerName(serverInfo.Version, infoOutput)
+    serverInfo.Version = ParseServerVersion(infoCommandOutput)
+    serverInfo.Name = ParseServerName(serverInfo.Version, infoCommandOutput)
 
     // Set Online field based on server name and version
     if serverInfo.Name != "" && serverInfo.Version != "" {
@@ -45,20 +50,25 @@ func GetServerData(serverName string) (*ServerInfo, error) {
         serverInfo.Online = false
     }
 
-    playersOutput, err := sendCommand(serverName, PALWORLD_RCON_COMMANDS.SHOW_PLAYERS)
+    playersCommandOutput, err := sendCommand(configServer, cmdShowPlayers)
     if err != nil {
         log.Printf("Error running INFO: %v", err)
     }
-    log.Printf("playersOutput: %v", playersOutput)
+    log.Printf("playersCommandOutput: %v", playersCommandOutput)
+
     // Parse player list
-    count, players := ParsePlayerList(playersOutput)
+    count, players := ParsePlayerList(playersCommandOutput)
     serverInfo.Players.Count = count
     serverInfo.Players.List = players
-
     return serverInfo, nil
 }
 
 func ParseServerVersion(input string) string {
+    if input == "" {
+        log.Println("Input is null or empty in ParseServerVersion")
+        return ""
+    }
+    
     parts := strings.Split(input, "[")
     if len(parts) < 2 {
         log.Println("Invalid input format in ParseServerVersion")
@@ -69,6 +79,12 @@ func ParseServerVersion(input string) string {
 }
 
 func ParseServerName(version, input string) string {
+    // Check if the input is null or empty
+    if input == "" {
+        log.Println("Input is null or empty in ParseServerName")
+        return ""
+    }
+
     // Define the prefix pattern
     prefix := "Welcome to Pal Server[" + version + "] "
 
@@ -146,10 +162,27 @@ func ParsePlayerList(input string) (int, []Player) {
 	return count, players
 }
 
-func sendCommand(serverName string, command string) (string, error) {
-    output, err := ExecuteShellCommand(CONFIG.CLI_ROOT, COMMANDS.CONFIG, CONFIG.CLI_CONFIG, COMMANDS.ENV, serverName, command)
-    if err != nil {
-        return "", err // Return the error directly
-    }
-    return string(output), nil // Convert output to string before returning
+func sendCommand(configServer ConfigServer, command string) (string, error) {
+	if configServer.Address == "" {
+		return "", errors.New("RCON server address is empty")
+	}
+	if configServer.Password == "" {
+		return "", errors.New("RCON server password is empty")
+	}
+
+	conn, err := rcon.Dial(configServer.Address, configServer.Password)
+	if err != nil {
+		log.Println("Error connecting to RCON server:", err)
+		return "", err
+	}
+	defer conn.Close()
+
+	response, err := conn.Execute(command)
+	if err != nil {
+		log.Println("Error executing command:", err)
+		return "", err
+	}
+
+	fmt.Println(response)
+	return string(response), nil // Convert output to string before returning
 }
