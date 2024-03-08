@@ -8,6 +8,7 @@ import (
 	"github.com/gorcon/rcon"
     "fmt"
     "errors"
+	"time"
 )
 
 type ServerInfo struct {
@@ -169,8 +170,8 @@ func sendCommand(configServer ConfigServer, command string) (string, error) {
 	if configServer.Password == "" {
 		return "", errors.New("RCON server password is empty")
 	}
-
-	conn, err := rcon.Dial(configServer.Address, configServer.Password, rcon.SetDialTimeout(configServer.Timeout), rcon.SetDeadline(configServer.Timeout))
+    timoutDur,_ :=  time.ParseDuration(configServer.Timeout)
+	conn, err := rcon.Dial(configServer.Address, configServer.Password, rcon.SetDialTimeout(timoutDur.Seconds()), rcon.SetDeadline(timoutDur.Seconds()))
 	if err != nil {
 		log.Println("Error connecting to RCON server:", err)
 		return "", err
