@@ -39,31 +39,31 @@ Replace the default values as needed when running the binary.
 - `/rcon/`: This route lists all available servers and their information.
 - /api: The PalWorld server list api
   - accepts query params
-  - requires a ?q param to search by server name.
+  - requires a ?name param to search by server name.
   - additional params can further filter the list.
 
 #### API Route Params
 
-| Query Key       | Example                |
-|-----------------|------------------------|
-| server_id       | ?server_id=123         |
-| namespace       | ?namespace=example     |
-| type            | ?type=public           |
-| region          | ?region=US             |
-| name            | ?name=MyServer         |
-| map_name        | ?map_name=Map1         |
-| description     | ?description=Description |
-| address         | ?address=example.com   |
-| port            | ?port=8080             |
-| is_password     | ?is_password=true      |
-| version         | ?version=1.0           |
-| created_at      | ?created_at=1234567890 |
-| update_at       | ?update_at=1234567890  |
-| world_guid      | ?world_guid=123        |
-| current_players | ?current_players=5     |
-| max_players     | ?max_players=10        |
-| days            | ?days=30               |
-| server_time     | ?server_time=1234567890|
+| Query Key       | Example                | Required |
+|-----------------|------------------------|----------|
+| name            | ?name=MyServer         | &#10003; |
+| server_id       | ?server_id=123         | &#9744;  |
+| namespace       | ?namespace=example     | &#9744;  |
+| type            | ?type=public           | &#9744;  |
+| region          | ?region=US             | &#9744;  |
+| map_name        | ?map_name=Map1         | &#9744;  |
+| description     | ?description=Description | &#9744;  |
+| address         | ?address=example.com   | &#9744;  |
+| port            | ?port=8080             | &#9744;  |
+| is_password     | ?is_password=true      | &#9744;  |
+| version         | ?version=1.0           | &#9744;  |
+| created_at      | ?created_at=1234567890 | &#9744;  |
+| update_at       | ?update_at=1234567890  | &#9744;  |
+| world_guid      | ?world_guid=123        | &#9744;  |
+| current_players | ?current_players=5     | &#9744;  |
+| max_players     | ?max_players=10        | &#9744;  |
+| days            | ?days=30               | &#9744;  |
+| server_time     | ?server_time=1234567890| &#9744;  |
 
 ### Docker Installation
 

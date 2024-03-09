@@ -39,59 +39,74 @@ type ServerListResponse struct {
 	Region      string   `json:"region"`
 	IsNextPage  bool     `json:"is_next_page"`
 	ServerList  []Server `json:"server_list"`
+	NextPageURL string   `json:"next_page_url"`
 }
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters
 	queryParams := r.URL.Query()
 
-	// Construct the search URL
+	// Check if the "name" query parameter is provided
+	nameQuery := queryParams.Get("name")
+	if nameQuery == "" {
+		http.Error(w, "Name query parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	// Set the default search field to "q" if not provided
+	if queryParams.Get("q") == "" {
+		queryParams.Set("q", nameQuery)
+	}
+
+	// Construct the initial search URL
 	searchURL := config.ApiConfig.Base + config.ApiConfig.Search + "?q=" + url.QueryEscape(queryParams.Get("q"))
 
-	// Send a request to the search endpoint
-	response, err := http.Get(searchURL)
-	if err != nil {
-		log.Printf("Error searching for server: %s", err)
-		http.Error(w, fmt.Sprintf("Error searching for server: %s", err), http.StatusInternalServerError)
-		return
-	}
-	defer response.Body.Close()
+	var allServers []Server
 
-	// Decode the response JSON
-	var serverListResponse ServerListResponse
-	err = json.NewDecoder(response.Body).Decode(&serverListResponse)
-	if err != nil {
-		log.Printf("Error decoding search response: %s", err)
-		http.Error(w, fmt.Sprintf("Error decoding search response: %s", err), http.StatusInternalServerError)
-		return
-	}
-
-	// If no servers found, return empty response
-	if len(serverListResponse.ServerList) == 0 {
-		log.Println("No servers found.")
-		http.Error(w, "No servers found.", http.StatusNotFound)
-		return
-	}
-
-	// If there is only one result, return the object directly
-	if len(serverListResponse.ServerList) == 1 {
-		serverJSON, err := json.Marshal(serverListResponse.ServerList[0])
+	// Pagination loop
+	for {
+		// Send a request to the search endpoint
+		response, err := http.Get(searchURL)
 		if err != nil {
-			log.Printf("Error marshalling server to JSON: %s", err)
-			http.Error(w, fmt.Sprintf("Error marshalling server to JSON: %s", err), http.StatusInternalServerError)
+			log.Printf("Error searching for server: %s", err)
+			http.Error(w, fmt.Sprintf("Error searching for server: %s", err), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(serverJSON)
-		return
+		defer response.Body.Close()
+
+		// Decode the response JSON
+		var serverListResponse ServerListResponse
+		err = json.NewDecoder(response.Body).Decode(&serverListResponse)
+		if err != nil {
+			log.Printf("Error decoding search response: %s", err)
+			http.Error(w, fmt.Sprintf("Error decoding search response: %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		// If no servers found, return empty response
+		if len(serverListResponse.ServerList) == 0 {
+			log.Println("No servers found.")
+			http.Error(w, "No servers found.", http.StatusNotFound)
+			return
+		}
+
+		// Append servers to the result
+		allServers = append(allServers, serverListResponse.ServerList...)
+
+		// Check if there are more pages
+		if !serverListResponse.IsNextPage {
+			break
+		}
+
+		// Update the search URL for the next page
+		searchURL = config.ApiConfig.Base + serverListResponse.NextPageURL
 	}
 
 	// Filter servers based on query parameters other than "q"
-	filteredServers := serverListResponse.ServerList
+	filteredServers := allServers
 	for key, values := range queryParams {
-		// Skip filtering if the query parameter is "q"
-		if key == "q" {
+		// Skip filtering if the query parameter is "q" or "name"
+		if key == "q" || key == "name" {
 			continue
 		}
 		if len(values) > 0 {
