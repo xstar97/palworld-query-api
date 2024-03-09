@@ -39,6 +39,8 @@ Replace the default values as needed when running the binary.
 - `/rcon/`: This route lists all available servers and their information.
 - /api: The PalWorld server list api
   - accepts query params
+  - requires a ?q param to search by server name.
+  - additional params can further filter the list.
 
 #### API Route Params
 
