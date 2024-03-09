@@ -27,7 +27,6 @@ You can customize the behavior of *palworld-query-api* using the following comma
 | `-port`            | Web port                              | `3000`             |
 | `-cli-config`      | Root path to rcon.yaml                | `/config/rcon.yaml`|
 | `-logs-path`       | Logs path                             | `/logs`            |
-| `-cache-path`       | Cache path                           | `/cache`           |
 
 Replace the default values as needed when running the binary.
 
@@ -82,7 +81,6 @@ services:
       - "3000:3000"
     volumes:
       - ./config:/config
-      - ./cache:/cache
       - ./logs:/logs
 ```
 
@@ -101,10 +99,6 @@ an env variable `CONFIG_JSON` can be set to automatically create the rcon.yaml f
   ]
 }
 ```
-
-### TimeOuts and Warnings
-
-try increasing the timeout value if using a remote server; the min recommended timeout for palworld is 60s; if the server is not local to you; increase it.
 
 ### HomePage Integration CustomAPI API route
 
@@ -134,6 +128,8 @@ the output of this route /api/?name=SERVER_NAME
   "server_time": 37
 }
 ```
+
+The custom widget for homepage:
 
 ```yaml
     - PalWorld:
@@ -176,6 +172,8 @@ the output of this route /rcon/:name
   }
 }
 ```
+
+The custom widget for homepage:
 
 ```yaml
     - PalWorld:

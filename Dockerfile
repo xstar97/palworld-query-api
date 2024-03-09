@@ -54,7 +54,6 @@ RUN addgroup -g $APP_GROUP_ID -S $APP_GROUP && \
 # Set environment variables
 ENV RCON_CLI_CONFIG=/config/rcon.yaml \
     LOGS_PATH=/logs \
-    CACHE_PATH=/cache \
     PORT=3000
 
 # Change ownership of the /config directory to the non-root user and group
@@ -62,9 +61,6 @@ RUN chown -R $APP_USER:$APP_GROUP /config
 
 # Change ownership of the logs directory to the non-root user and group
 RUN chown -R $APP_USER:$APP_GROUP $LOGS_PATH
-
-# Change ownership of the cache directory to the non-root user and group
-RUN chown -R $APP_USER:$APP_GROUP $CACHE_PATH
 
 # Expose the port
 EXPOSE $PORT
