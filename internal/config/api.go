@@ -73,9 +73,9 @@ var HtmlDetailsTemplate =
     </style>
 </head>
 <body>
-<div class="server-details">
+<div class="server-details" style="border-color: {{if .IsPassword}}red{{else}}green{{end}}">
     <div class="version-info-container">
-        <p class="version-info">{{.Version}} {{if .IsPassword}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔒" alt="Has Password"/>{{else}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔓" alt="No Password"/>{{end}}</p>
+        <p class="version-info">{{.Version}} {{if .IsPassword}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔒?style=google" alt="Has Password"/>{{else}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔓?style=google" alt="No Password"/>{{end}}</p>
     </div>
     <div class="other-details">
 	<table>
@@ -212,19 +212,19 @@ var HtmlListTemplate =
 <body>
     <ul class="server-list">
         {{range .}}
-		<div class="clickable-item" onclick="location.href='?name={{.Name}}&server_id={{.ServerID}}';">
-		<li class="server-item">
-			<p class="version-info">{{.Version}} {{if .IsPassword}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔒" alt="Has Password"/>{{else}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔓" alt="No Password"/>{{end}}</p>
-			{{if ne .Name ""}}
-				<h4>{{.Name}}</h4>
-			{{end}}
-			{{if ne .Description ""}}
-				<p>{{.Description}}</p>
-			{{end}}
-			<p>{{.Address}}:{{.Port}}</p>
-			<p class="players">Players: {{.CurrentPlayers}}/{{.MaxPlayers}}</p>
-			</li>
-		</div>
+        <div class="clickable-item" onclick="location.href='?name={{.Name}}&server_id={{.ServerID}}';">
+            <li class="server-item" style="border-color: {{if .IsPassword}}red{{else}}green{{end}}">
+                <p class="version-info">{{.Version}} {{if .IsPassword}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔒?style=google" alt="Has Password"/>{{else}}<img class="lock-icon" src="https://emojicdn.elk.sh/🔓?style=google" alt="No Password"/>{{end}}</p>
+                {{if ne .Name ""}}
+                <h4>{{.Name}}</h4>
+                {{end}}
+                {{if ne .Description ""}}
+                <p>{{.Description}}</p>
+                {{end}}
+                <p>{{.Address}}:{{.Port}}</p>
+                <p class="players">Players: {{.CurrentPlayers}}/{{.MaxPlayers}}</p>
+            </li>
+        </div>
         {{end}}
     </ul>
 </body>
