@@ -124,9 +124,9 @@ the output of this route /api/?name=SERVER_NAME
   "created_at": 050505050505,
   "update_at": 060606060,
   "world_guid": "WORLD_GUID",
-  "current_players": 9000, # OVER 9000!
+  "current_players": 32,
   "max_players": 32,
-  "days": 7366,
+  "days": 9001, # OVER 9000!
   "server_time": 37
 }
 ```
@@ -169,7 +169,7 @@ the output of this route /rcon/:name
   "serverName": "",
   "serverVer": "",
   "players": {
-    "count": 0,
+    "count": 9001, # over 9000!
     "list": []
   }
 }
